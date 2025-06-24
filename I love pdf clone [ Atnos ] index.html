@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JPG to PDF | Atnos</title>
+
+  <!-- Preload logos -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/googledrive.svg" as="image">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/dropbox.svg" as="image">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f7f7fb;
+      text-align: center;
+    }
+
+    header {
+      background: #fff;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #d62828;
+    }
+
+    nav a, .dropdown-btn {
+      margin: 0 12px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    main {
+      margin-top: 60px;
+    }
+
+    .upload-box {
+      display: inline-block;
+      padding: 30px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .choose-label {
+      background: #d62828;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+
+    #fileUpload {
+      display: none;
+    }
+
+    #drop-area {
+      border: 2px dashed #d62828;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fff0f0;
+      margin-top: 20px;
+      transition: background 0.2s;
+    }
+
+    #drop-area.dragover {
+      background-color: #ffdada;
+      border-color: #a80000;
+    }
+
+    .drive-dropbox-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: white;
+      padding: 5px;
+      margin: 0 10px;
+      border: 1px solid #ddd;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .spinner {
+      display: none;
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #999;
+      background-color: #fff;
+      margin-top: 80px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Atnos</div>
+    <nav>
+      <a href="#">Home</a>
+      <span class="dropdown-btn">PDF Tools ▾</span>
+      <a href="#">All Tools</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>JPG to PDF</h1>
+    <p>Convert JPG images to PDF in seconds. Easily adjust orientation and margins.</p>
+    <div class="upload-box">
+      <label for="fileUpload" class="choose-label">Select JPG image</label>
+      <input type="file" id="fileUpload" accept="image/*" />
+      <div id="drop-area">or drag & drop your image here</div>
+
+      <div class="drive-dropbox-buttons">
+        <img 
+          src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/googledrive.svg" 
+          alt="Google Drive" 
+          class="icon-btn" 
+          title="Import from Google Drive"
+          aria-label="Import from Google Drive"
+          onclick="onAuthApiLoad()" 
+        />
+        <img 
+          src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/dropbox.svg" 
+          alt="Dropbox" 
+          class="icon-btn" 
+          title="Import from Dropbox"
+          aria-label="Import from Dropbox"
+          onclick="handleDropboxClick()" 
+        />
+      </div>
+
+      <div class="spinner" id="spinner">Loading...</div>
+    </div>
+  </main>
+
+  <footer>
+    © Atnos 2025 ® - Your PDF Editor
+  </footer>
+
+  <!-- Dropbox SDK -->
+  <script src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="dbx1234567890abcdef"></script>
+
+  <!-- Google API -->
+  <script src="https://apis.google.com/js/api.js"></script>
+
+  <script>
+    const fileInput = document.getElementById("fileUpload");
+    const dropArea = document.getElementById("drop-area");
+    const spinner = document.getElementById("spinner");
+
+    function showSpinner(show = true) {
+      spinner.style.display = show ? 'block' : 'none';
+    }
+
+    function handleImage(file) {
+      if (file && file.type.startsWith("image/")) {
+        showSpinner(true);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          localStorage.setItem("previewImage", e.target.result);
+          localStorage.setItem("fileName", file.name || "image.jpg");
+          setTimeout(() => {
+            window.location.href = "editor.html";
+          }, 50);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please select a valid image file.");
+      }
+    }
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      handleImage(file);
+    });
+
+    dropArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropArea.classList.add("dragover");
+    });
+
+    dropArea.addEventListener("dragleave", () => {
+      dropArea.classList.remove("dragover");
+    });
+
+    dropArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropArea.classList.remove("dragover");
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleImage(files[0]);
+      }
+    });
+
+    dropArea.addEventListener("click", () => fileInput.click());
+
+    // Dropbox Picker
+    function handleDropboxClick() {
+      Dropbox.choose({
+        success: function (files) {
+          showSpinner(true);
+          fetch(files[0].link)
+            .then(res => res.blob())
+            .then(blob => {
+              const name = files[0].name;
+              handleImage(new File([blob], name, { type: blob.type }));
+            });
+        },
+        linkType: "direct",
+        multiselect: false,
+        extensions: [".jpg", ".jpeg", ".png"]
+      });
+    }
+
+    // Google Picker
+    let oauthToken;
+
+    function onApiLoad() {
+      gapi.load("auth", { callback: onAuthApiLoad });
+      gapi.load("picker", { callback: onPickerApiLoad });
+    }
+
+    function onAuthApiLoad() {
+      gapi.auth.authorize({
+        client_id: "1234567890-abcdefg.apps.googleusercontent.com",
+        scope: ["https://www.googleapis.com/auth/drive.readonly"],
+        immediate: false
+      }, handleAuthResult);
+    }
+
+    function onPickerApiLoad() {
+      // Picker loaded, ready for use
+    }
+
+    function handleAuthResult(authResult) {
+      if (authResult && !authResult.error) {
+        oauthToken = authResult.access_token;
+        createPicker();
+      }
+    }
+
+    function createPicker() {
+      const picker = new google.picker.PickerBuilder()
+        .addView(google.picker.ViewId.DOCS_IMAGES)
+        .setOAuthToken(oauthToken)
+        .setDeveloperKey("AIzaSyXXXXXX-FAKE-GOOGLE-KEY")
+        .setCallback(pickerCallback)
+        .build();
+      picker.setVisible(true);
+    }
+
+    function pickerCallback(data) {
+      if (data.action === google.picker.Action.PICKED) {
+        showSpinner(true);
+        const file = data.docs[0];
+        fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
+          headers: new Headers({ Authorization: "Bearer " + oauthToken })
+        })
+        .then(res => res.blob())
+        .then(blob => {
+          handleImage(new File([blob], file.name, { type: blob.type }));
+        });
+      }
+    }
+
+    window.addEventListener("load", onApiLoad);
+  </script>
+</body>
+</html>
