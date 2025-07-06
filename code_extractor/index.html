@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Advanced Code Extract</title>
+  <link rel="stylesheet" href="css/styles.css">
+<script src="js/script.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="bubble-layer" id="bubbleLayer"></div>
+
+  <div class="container">
+    <div class="title-wrap">
+      <span class="menu-toggle">&gt;</span>
+      <h1><span class="typed-text"></span><span class="cursor">|</span></h1>
+      <div class="menu-box">
+        <div onclick="toggleTheme()">🎨 Toggle Theme</div>
+        <div onclick="clearAll()">🗑️ Clear All</div>
+        <div onclick="saveToLocal()">💾 Save</div>
+      </div>
+    </div>
+
+    <div class="glass">
+      <label for="urlInput">Paste a Website URL</label>
+      <input type="text" id="urlInput" placeholder="https://example.com">
+      <div id="statusMessage" class="status-message"></div>
+      <button onclick="extractCode()" id="extractBtn">
+        <span id="btnText">Extract Code</span>
+        <span id="btnLoader" class="loading" style="display: none;"></span>
+      </button>
+      
+      <div class="export-section">
+        <button class="export-btn" onclick="exportAsZip()" id="zipBtn">
+          ⬇️ Export as ZIP
+          <div class="progress"></div>
+        </button>
+        <button class="export-btn" onclick="downloadHTML()">
+          ⬇️ Export as HTML
+          <div class="progress"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="glass">
+      <h2>HTML Extracted:</h2>
+      <pre id="codeOutput">Waiting for input...</pre>
+    </div>
+
+    <div class="glass">
+      <h2>CSS Extracted:</h2>
+      <pre id="cssOutput">Waiting for input...</pre>
+    </div>
+
+    <div class="glass">
+      <h2>JavaScript Extracted:</h2>
+      <pre id="jsOutput">Waiting for input...</pre>
+    </div>
+
+    <div class="glass">
+      <h2>Live Preview:</h2>
+      <iframe id="previewFrame" sandbox="allow-same-origin allow-scripts allow-forms allow-modals"></iframe>
+      <div class="preview-actions">
+        <button onclick="refreshPreview()" style="width: auto; padding: 8px 16px;">🔄 Refresh Preview</button>
+        <button onclick="openInNewTab()" style="width: auto; padding: 8px 16px; margin-left: 10px;">🌐 Open in New Tab</button>
+      </div>
+      <p style="font-size: 0.8rem; opacity: 0.6;">
+        ⚠️ Preview may not render perfectly due to CORS restrictions. 
+        External resources may be blocked by the browser.
+      </p>
+    </div>
+
+    <div class="footer">🔐 100% client-side. No server data accessed.</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
